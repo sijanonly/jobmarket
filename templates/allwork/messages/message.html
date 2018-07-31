@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/message.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+          <div class="headind_srch">
+            <div class="recent_heading">
+              <h4>Recent</h4>
+            </div>
+           
+          </div>
+          <div class="inbox_chat">
+            <!-- <div class="chat_list active_chat">
+              <div class="chat_people">
+                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                <div class="chat_ib">
+                  <h5>{{active_conversation.recipient}} <span class="chat_date">{{active_conversation.sent_at | naturaltime}}</span></h5>
+                  <p>{{active_conversation.content | safe}}.</p>
+                </div>
+              </div>
+            </div> -->
+
+            {% for chat in conversations %}
+
+            <div class="chat_list {% if forloop.counter == 1 %} active_chat {% endif %}">
+              <a style="display: block;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;" href="{% url 'messages:user_message' chat.pk %}" class="fill-div">
+              <div class="chat_people">
+                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                <div class="chat_ib">
+                  <h5>
+
+                  
+
+                  {{chat.recipient}}
+
+                  </h5>
+                </div>
+              </div>
+
+              </a>
+
+
+            </div>
+
+
+            {% endfor %}
+
+          </div>
+        </div>
+        <div class="mesgs">
+          <div class="msg_history">
+
+
+          {% for conversation in running_conversations %}
+
+
+            {% if user == conversation.sender %}
+
+            <div class="outgoing_msg">
+              <div class="sent_msg">
+                <p>{{ conversation.content | safe }}</p>
+                <span class="time_date"> {{ conversation.sent_at | naturaltime }}</span> </div>
+            </div>
+
+            {% else %}
+
+
+             <div class="incoming_msg">
+              <div class="incoming_msg_img">
+               <img src="https://ptetutorials.com/images/user-profile.png" alt="{{conversation.recipient.username}}"> </div>
+              <div class="received_msg">
+                <div class="received_withd_msg">
+                   <p>{{ conversation.content | safe }}</p>
+                <span class="time_date"> {{ conversation.sent_at | naturaltime }}</span> </div>
+              </div>
+            </div>
+
+
+            {% endif %}
+            
+           
+            
+
+            {% endfor %}
+
+          </div>
+          <div class="type_msg">
+            <div class="input_msg_write">
+           <form method="post" novalidate >
+    {% csrf_token %}
+      {% for field in form %}
+   
+    {{ field }}
+
+    {% if field.help_text %}
+      {{ field.help_text }}
+    {% endif %}
+
+    {% for error in field.errors %}
+      {{ error }}
+    {% endfor %}
+
+  {% endfor %}
+    <!-- <button type="submit" class="btn btn-success">Save</button> -->
+     <button class="msg_send_btn" type="submit"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+    <!-- <a href="" class="btn btn-outline-secondary" role="button">Nevermind</a> -->
+  </form>
+              <!-- <input type="text" class="write_msg" placeholder="Type a message" /> -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+    </div>
+
+{% endblock %}

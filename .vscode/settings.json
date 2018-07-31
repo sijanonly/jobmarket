@@ -1,0 +1,14 @@
+{
+    "python.pythonPath": "/home/leapfrong/workspace/envs/envallwork/bin/python",
+    "team.showWelcomeMessage": false,
+    "editor.formatOnSave": true,
+    "python.linting.pep8Enabled": true,
+    "python.linting.pylintPath": "/home/leapfrong/workspace/envs/envallwork/bin/pylint",
+    "python.linting.pylintArgs": [
+        "--load-plugins",
+        "pylint_django"
+    ],
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "yapf"
+}

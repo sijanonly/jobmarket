@@ -1,0 +1,8 @@
+callstatus_id = 3
+created_by = FHFImport
+
+null for duration spoke_with_intendd
+
+call_purpose = collection (Payment due,nsf)
+
+servicing (Payment Post)
