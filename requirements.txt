@@ -29,3 +29,4 @@ whitenoise
 python-decouple
 dj-database-url
 django-crispy-forms==1.7.2
+django-taggit==0.22.2
