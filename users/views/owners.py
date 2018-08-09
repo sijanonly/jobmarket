@@ -22,10 +22,14 @@ class SignUpView(CreateView):
     template_name = 'registration/signup_form.html'
 
     def get_context_data(self, **kwargs):
+        """Updates current context with 'user_type' to indicate current user type.
+        """
         kwargs['user_type'] = 'project owner'
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
+        """Checks form valid and login the current signup user and redirect to job list.
+        """
         user = form.save()
         login(self.request, user)
         return redirect('jobs:job_list')

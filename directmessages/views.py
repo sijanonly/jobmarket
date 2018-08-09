@@ -28,11 +28,23 @@ class MessageDetailView(CreateView):
     template_name = 'allwork/messages/message.html'
 
     def get_context_data(self, **kwargs):
+        """Returns conversations based on different conditions.
+            1. Fetch message based on chatroom (sender, recipient)
+            2. Fetch current conversation of the current user and assign it
+            to conversations context value
+            3. If current loggedIn user is sender, active_recipient will be
+            message recipient otherwise, message sender.
+            4. Fetch active conversation for message / chat tab.
+
+        Args:
+            **kwargs: Description
+
+        Returns:
+            TYPE: Description
+        """
         chat_id = self.kwargs.get('pk')
 
         chatroom = ChatRoom.objects.get(pk=chat_id)
-
-        print('chatroom is', chatroom)
 
         message = Message.objects.filter(
             sender=chatroom.sender,
@@ -43,16 +55,11 @@ class MessageDetailView(CreateView):
                 recipient=chatroom.sender).first()
 
         # MessagingService().mark_as_read(message)
-        print('i am called......')
         user = self.request.user
-
-        print('message is', message)
 
         kwargs['active_conversation'] = message
         current_conversations = MessagingService().get_conversations(user=self.request.user)
-        # current_conversations = MessagingService().get_conversations(user=message.recipient)
         kwargs['conversations'] = current_conversations
-        # kwargs['conversations'] = [conv for conv in current_conversations if message.pk != conv.pk]
 
         if user == message.sender:
             active_recipient = message.recipient
@@ -60,11 +67,17 @@ class MessageDetailView(CreateView):
             active_recipient = message.sender
         running_conversations = MessagingService().get_active_conversations(user, active_recipient)
         kwargs['running_conversations'] = running_conversations
-
-        # kwargs['form'] = MessageForm
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
+        """Checks for valid form and submit with updating message object.
+
+        Args:
+            form (form): form object
+
+        Returns:
+            redirect: Returns to current message conversation.
+        """
         obj = self.get_object()
 
         if self.request.user == obj.sender:
@@ -80,6 +93,7 @@ class MessageDetailView(CreateView):
         messages.success(self.request, 'The message is sent with success!')
         return redirect('messages:user_message', obj.pk)
 
+
 @method_decorator([login_required], name='dispatch')
 class MessageView(RedirectView):
 
@@ -88,11 +102,13 @@ class MessageView(RedirectView):
     pattern_name = 'messages:user_message'
 
     def get_redirect_url(self, *args, **kwargs):
+        """Prepares redirect url when the project owner accept the proposal.
+
+        """
         user = self.request.user
 
         chatroom = ChatRoom.objects.filter(Q(sender=user) | Q(recipient=user)).first()
         if chatroom:
             return super().get_redirect_url(*args, pk=chatroom.pk)
-        else:
-            messages.warning(self.request, 'You do not have any messages to show')
-            return reverse('jobs:job_list')
+        messages.warning(self.request, 'You do not have any messages to show')
+        return reverse('jobs:job_list')

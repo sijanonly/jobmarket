@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-
+from django.contrib import messages
 from django.urls import reverse
 from django.views.generic.edit import CreateView
 from django.views.generic import TemplateView, UpdateView
@@ -11,26 +11,22 @@ from ..forms import SignUpForm
 
 
 def home(request):
-    # if request.user.is_authenticated:
-    #     if request.user.is_owner:
-    #         return redirect('owners:quiz_change_list')
-    #     else:
-    #         return redirect('freelancers:quiz_list')
+    """Renders home template.
+    """
     return render(request, 'allwork/home.html')
 
 
 class SignUpView(TemplateView):
+    """
+    Renders signup select page (freelancer / project owner)
+    """
     template_name = 'registration/signup.html'
 
 
-class UserRegister(CreateView):
-    model = User
-    form_class = SignUpForm
-    template_name = 'signup.html'
-
-    # def form_valid(self, form):
-    #     form.instance.created_by = self.request.user
-    #     return super().form_valid(form)
+# class UserRegister(CreateView):
+#     model = User
+#     form_class = SignUpForm
+#     template_name = 'signup.html'
 
 
 class UserJobProfile(TemplateView):
@@ -39,11 +35,11 @@ class UserJobProfile(TemplateView):
     template_name = 'allwork/jobs/job_profile.html'
 
     def get_context_data(self, **kwargs):
+        """Prepares user context value based on username request from url.
+        """
         context = super(UserJobProfile, self).get_context_data(**kwargs)
         username = self.kwargs.get('username')
-        # here's the difference:
-        print('uer is', User.objects.get(username=username))
-        context['user'] = User.objects.get(username=username)
+        context['profile'] = User.objects.get(username=username)
         return context
 
 
@@ -53,17 +49,31 @@ class UserDetailView(TemplateView):
     template_name = 'allwork/freelancers/user_profile.html'
 
     def get_context_data(self, **kwargs):
+        """Prepares user context value based on username request from url.
+        """
         context = super(UserDetailView, self).get_context_data(**kwargs)
         username = self.kwargs.get('username')
-        context['user'] = User.objects.get(username=username)
+        context['profile'] = User.objects.get(username=username)
         return context
 
 
 class UpdateProfileView(UpdateView):
     model = User
-    fields = ['first_name', 'last_name']  # Keep listing whatever fields
+    fields = ['avatar', 'first_name', 'last_name', 'profile', 'skills']  # Keep listing whatever fields
     template_name = 'allwork/freelancers/user_profile_update.html'
 
+    def form_valid(self, form):
+        """Checks valid form and add/save many to many tags field in user object.
+        """
+        user = form.save(commit=False)
+
+        user.save()
+        form.save_m2m()
+        messages.success(self.request, 'Your profile is updated successfully!')
+        return redirect('users:user_profile', self.object.username)
 
     def get_success_url(self):
+        """
+        Prepares success url for successful form submission.
+        """
         return reverse('users:user_profile', kwargs={'username': self.object.username})

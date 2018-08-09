@@ -41,6 +41,10 @@ class Message(models.Model):
         return self.content
 
     def save(self, **kwargs):
+        """
+        check message sender and recipient and raise error if they are save;
+        save message when the condition passes.
+        """
         if self.sender == self.recipient:
             raise ValidationError("You can't send messages to yourself")
 
@@ -52,6 +56,11 @@ class Message(models.Model):
 class ChatRoom(models.Model):
     """
     A private chat room.
+
+    Attributes:
+        created_at (datetime): datetime value when chatroom is created.
+        recipient (user): user whom the chatroom sends first message.
+        sender (user): user who created the chatroom
     """
     sender = models.ForeignKey(
         AUTH_USER_MODEL, on_delete=models.CASCADE,

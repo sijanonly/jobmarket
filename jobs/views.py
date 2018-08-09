@@ -1,21 +1,22 @@
 import os
-
 from django.conf import settings
+from django.http import HttpResponse
+from django.http import Http404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, ListView, UpdateView
-from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
 
-from directmessages.models import ChatRoom
-from directmessages.services import MessagingService
+from django.views.generic.base import RedirectView
+
 from jobs.models import Job, JobProposal
 from users.models import User
 
+from directmessages.services import MessagingService
+from directmessages.models import ChatRoom
 # Create your views here.
 
 
@@ -25,6 +26,7 @@ class JobListView(ListView):
     context_object_name = 'jobs'
     template_name = 'allwork/jobs/job_list.html'
     queryset = Job.objects.all()
+    paginate_by = 5  #and that's it !!
 
 
 @method_decorator([login_required], name='dispatch')
@@ -61,7 +63,7 @@ class JobDetailView(DetailView):
 
 class JobApplyView(CreateView):
     model = JobProposal
-    fields = ('proposal', )
+    fields = ('proposal',)
     template_name = 'allwork/jobs/job_apply_form.html'
 
     # def get_success_url(self):
@@ -99,22 +101,19 @@ class ProposalAccceptView(RedirectView):
         # Create Message opening
         is_chatroom = False
         try:
-            chatroom = ChatRoom.objects.get(
-                sender=self.request.user, recipient=job.freelancer)
+            chatroom = ChatRoom.objects.get(sender=self.request.user, recipient=job.freelancer)
             is_chatroom = True
         except:
             pass
 
         if not is_chatroom:
             try:
-                chatroom = ChatRoom.objects.get(
-                    sender=job.freelancer, recipient=self.request.user)
+                chatroom = ChatRoom.objects.get(sender=job.freelancer, recipient=self.request.user)
             except:
                 pass
 
         if not is_chatroom:
-            chatroom = ChatRoom.objects.create(
-                sender=self.request.user, recipient=job.freelancer)
+            chatroom = ChatRoom.objects.create(sender=self.request.user, recipient=job.freelancer)
 
         print('is chatroom', is_chatroom)
         print('chat roo', chatroom)
@@ -133,14 +132,14 @@ class ProposalAccceptView(RedirectView):
             project details : <a href='{url}'> {job}</a>
 
 
-            """.format(
-                username=job.freelancer.username,
-                url=reverse("jobs:job_detail", kwargs={"pk": job.pk}),
-                job=job.job_title))
+            """.format(username=job.freelancer.username,
+                       url=reverse("jobs:job_detail", kwargs={"pk": job.pk}),
+                       job=job.job_title)
+
+        )
 
         messages.success(
-            self.request, 'User : {} is assiged to your project'.format(
-                kwargs.get('username')))
+            self.request, 'User : {} is assiged to your project'.format(kwargs.get('username')))
         return super().get_redirect_url(*args, pk=kwargs['pk'])
 
 
@@ -154,5 +153,6 @@ class JobCloseView(RedirectView):
         job = get_object_or_404(Job, pk=kwargs['pk'])
         job.status = 'ended'
         job.save()
-        messages.warning(self.request, 'Job is ended successfully')
+        messages.warning(
+            self.request, 'Job is ended successfully')
         return super().get_redirect_url(*args, pk=kwargs['pk'])

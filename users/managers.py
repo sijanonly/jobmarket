@@ -2,30 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 
 
-# class UserQuerySet(models.QuerySet):
-#     """
-#     Builds query for User model.
-#     """
-#     def owner(self):
-#         return self.filter(user_type='owner')
-
-#     def freelancers(self):
-#         return self.filter(user_type='freelancer')
-
-#     def sitters_not_reserved(self):
-#         return self.filter(booking_sitter=None, user_type='owner')
-
-#     def parents_not_reserved(self):
-#         return self.filter(booking_parent=None, user_type='freelancer')
-
-
 class UserManager(BaseUserManager):
-
-    # def get_queryset(self):
-    #     """
-    #     Derive user query set.
-    #     """
-    #     return UserQuerySet(self.model, using=self._db)
 
     def create_user(self, username, email, password, **kwargs):
         """
@@ -40,7 +17,7 @@ class UserManager(BaseUserManager):
             **kwargs: contaitns dictionary other user fields
 
         Returns:
-            TYPE: Description
+            user: current created user
 
         Raises:
             ValueError: When required fields are missing, it will raised.
@@ -79,14 +56,3 @@ class UserManager(BaseUserManager):
 
         return user
 
-    # def owner(self):
-    #     """
-    #     Returns parent user group from users.
-    #     """
-    #     return self.get_queryset().owner()
-
-    # def freelancers(self):
-    #     """
-    #     Returns sitter user group from users.
-    #     """
-    #     return self.get_queryset().freelancers()

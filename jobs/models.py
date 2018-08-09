@@ -14,6 +14,18 @@ class Job(models.Model):
     """
     Model to create a Job.
 
+    Attributes:
+        date_created (datetime): Datetime of job creation
+        date_modified (datetime): Datetime of job modified
+        document (file): Job description file
+        freelancer (user):  Freelancer whom the job assigned.
+        job_description (str): Job description
+        job_title (str): Job title
+        owner (user): User who owns the job
+        price (decimal): Job price
+        status (str): Job current status
+        tags (str): Tags representing job
+
     """
     # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(
@@ -56,6 +68,9 @@ class Job(models.Model):
 
     @property
     def freelancers(self):
+        """
+        It prepares all the freelancers of the current job.
+        """
         proposals = self.job_proposal.all()
         return [proposal.freelancer for proposal in proposals]
 
@@ -63,6 +78,11 @@ class Job(models.Model):
 class JobProposal(models.Model):
     """
     Model to create a freelancers's proposal for a JOB.
+
+    Attributes:
+        freelancer (user): User who submits job proposal
+        job (job): Job object
+        proposal (text): User proposal for the job
 
     """
     job = models.ForeignKey(

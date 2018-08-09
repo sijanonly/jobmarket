@@ -2,7 +2,7 @@
 # @Author: leapfrong
 # @Date:   2018-07-22 18:01:25
 # @Last Modified by:   leapfrong
-# @Last Modified time: 2018-07-22 20:38:19
+# @Last Modified time: 2018-08-06 16:09:22
 
 from django.contrib import messages
 from django.contrib.auth import login
@@ -24,10 +24,26 @@ class SignUpView(CreateView):
     template_name = 'registration/signup_form.html'
 
     def get_context_data(self, **kwargs):
+        """Updates context value 'user_type' in curernt context.
+        """
         kwargs['user_type'] = 'freelancer'
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
+        """Checks for valid form and call login for current signup user and
+        redirect to job list page.
+        """
         user = form.save()
         login(self.request, user)
         return redirect('jobs:job_list')
+
+
+class ListFreelancerView(ListView):
+    model = User
+    context_object_name = 'freelancers'
+    template_name = 'allwork/freelancers/freelancer_list.html'
+
+    def get_queryset(self):
+        """Prepare all freelancers based on is_freelancer col in user model.
+        """
+        return User.objects.filter(is_freelancer=True)

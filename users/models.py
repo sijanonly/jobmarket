@@ -8,6 +8,8 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from taggit.managers import TaggableManager
+
 # from bookings.models import Address
 
 from .managers import UserManager
@@ -30,15 +32,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     :is_superuser: Whether or not the User is of superuser status.
     :is_staff: Whether or not the User is of staff status.
     """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     email = models.EmailField(unique=True)
 
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
 
-    avatar = models.URLField(max_length=500, blank=True, null=True)
+    avatar = models.ImageField(upload_to='pic_folder', default='pic_folder/None/no-img.jpg')
+    profile = models.TextField(null=True, blank=True)
+    skills = TaggableManager(blank=True)
 
     is_owner = models.BooleanField('project owner status', default=False)
     is_freelancer = models.BooleanField('freelancer status', default=False)
@@ -86,4 +88,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             return "%s" % (self.email)
 
-    
+    @property
+    def income(self):
+        """
+        This property calculate the total income of the freelancer
+        based on total completed jobs.
+        """
+        completed_jobs = self.job_freelancer.filter(status='ended')
+
+        income = 0
+        for job in completed_jobs:
+            income += job.price
+
+        return income

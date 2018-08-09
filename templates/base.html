@@ -60,11 +60,23 @@
 
   <div class="collapse navbar-collapse justify-content-end" id="navbarCollapse">
   <ul class="navbar-nav">
+
+       {% if user.is_owner %}
    <li class="nav-item">
         
         
 <a  href="{% url 'jobs:job_add'%}" class="nav-link  btn btn-sm btn-outline-secondary float-right" type="button">Create Job</a>
       </li>
+      {% endif %}
+
+      {% if user.is_authenticated %}
+
+       <li class="nav-item">
+        
+        
+<a  href="{% url 'list_freelancer'%}" class="nav-link  btn btn-sm btn-outline-secondary float-right" type="button">Freelancers</a>
+      </li>
+      {% endif %}
   </ul>
 </div>
 {% if user.is_authenticated %}

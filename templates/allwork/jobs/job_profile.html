@@ -12,8 +12,8 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
                     
                   
-                    <a href="{% url 'update_profile' user.pk %}" class="dropdown-item" type="button">Edit</a>
-                    <a href="{% url 'users:job_profile' user.username %}" class="dropdown-item" type="button">Job List</a>
+                    <a href="{% url 'update_profile' profile.pk %}" class="dropdown-item" type="button">Edit</a>
+                    <a href="{% url 'users:job_profile' profile.username %}" class="dropdown-item" type="button">Job List</a>
                     <a href="{% url 'messages:list_message'%}" class="dropdown-item" type="button">Messages</a>
                 </div>
             </div>
@@ -27,15 +27,15 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="c-tab" role="tabpanel">
-                {% for job in user.job_freelancer.all %}
+                {% for job in profile.job_freelancer.all %}
                 <a href="{% url 'jobs:job_detail' job.pk %}">{{job.job_title}}</a> <br/><br/> {% endfor %}
             </div>
             <div class="tab-pane" id="m-tab" role "tabpanel"="">
-                {% for proposal in user.job_proposal.all %}
+                {% for proposal in profile.job_proposal.all %}
                 <a href="{% url 'jobs:job_detail' proposal.job.pk %}">{{proposal.job.job_title}}</a> <br/><br/>{% endfor %}
             </div>
             <div class="tab-pane" id="g-tab" role="tabpanel">
-                {% for job in user.job_owner.all %}
+                {% for job in profile.job_owner.all %}
                 <a href="{% url 'jobs:job_detail' job.pk %}">{{job.job_title}}</a><br/><br/> {% endfor %}
             </div>
         </div>
